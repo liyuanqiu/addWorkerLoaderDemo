@@ -1,28 +1,41 @@
-import React, { Component } from 'react';
-import logo from './logo.svg';
+import React, {
+  useState,
+  useEffect,
+  useMemo,
+} from 'react';
 import './App.css';
+import ExampleWorker from './example.worker';
 
-class App extends Component {
-  render() {
-    return (
-      <div className="App">
-        <header className="App-header">
-          <img src={logo} className="App-logo" alt="logo" />
-          <p>
-            Edit <code>src/App.js</code> and save to reload.
-          </p>
-          <a
-            className="App-link"
-            href="https://reactjs.org"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Learn React
-          </a>
-        </header>
-      </div>
-    );
-  }
+function App() {
+  const [number1, setNumber1] = useState(3);
+  const [number2, setNumber2] = useState(4);
+  const [sum, setSum] = useState();
+  const exampleWorker = useMemo(() => {
+    const worker = new ExampleWorker();
+    worker.onmessage = e => setSum(e.data);
+    return worker;
+  }, []);
+  useEffect(() => {
+    exampleWorker.postMessage([number1, number2]);
+  }, [number1, number2]);
+  return (
+    <div>
+      <input
+        type="number"
+        value={number1}
+        onChange={e => setNumber1(parseFloat(e.target.value))}
+      />
+      <input
+        type="number"
+        value={number2}
+        onChange={e => setNumber2(parseFloat(e.target.value))}
+      />
+      <span>=</span>
+      <span>
+        {sum}
+      </span>
+    </div>
+  );
 }
 
 export default App;
